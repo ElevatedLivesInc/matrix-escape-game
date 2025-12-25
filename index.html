@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MatrixXscape - Escape or Die Trying</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  
+  <!-- UI OVERLAY -->
+  <div id="ui">
+    <div>⏱️ <span id="score">0</span>s</div>
+    <div>❤️ <span id="lives">3</span></div>
+    <div>🧠 <span id="aiStatus">Awake</span></div>
+  </div>
+
+  <!-- GAME OVER SCREEN -->
+  <div id="gameOver" class="modal">
+    <div class="matrix-rain"></div>
+    <h2>🕹️ MATRIX TRAP!</h2>
+    <p>Survival: <span id="finalScore">0</span>s</p>
+    <p id="aiFeedback">Analyzing escape pattern...</p>
+    <div class="buttons">
+      <button id="escapePass">$11 Escape Pass<br><small>Unlimited Lives + AI Coach</small></button>
+      <button id="foundersPass">$111 Founders Pass<br><small>NFT Sigil + Monthly AI</small></button>
+      <button id="retry">🔄 Try Again Free</button>
+    </div>
+  </div>
+
+  <!-- VICTORY SCREEN -->
+  <div id="winScreen" class="modal">
+    <div class="matrix-rain"></div>
+    <h2>🚀 MATRIX ESCAPED!</h2>
+    <p>Time: <span id="winTime">0</span>s</p>
+    <p id="winFeedback">You are 92% awakened</p>
+    <div class="buttons">
+      <button onclick="shareScore()">📱 Share Victory</button>
+      <button id="bookCoach">⚡ Book AI Coach Now</button>
+      <button id="playAgain">Play Harder Level</button>
+    </div>
+  </div>
+
+  <!-- MOBILE CONTROLS -->
+  <div id="mobileControls" class="mobile-controls">
+    <div class="joystick">
+      <div class="joystick-knob"></div>
+    </div>
+    <button class="action-btn" id="shootBtn">🔫</button>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
