@@ -5,7 +5,6 @@
   <title>MatrixXscape – Escape or Die Trying</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Basic styling for game + overlays -->
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -26,17 +25,112 @@
     /* HUD */
     #ui {
       position: absolute;
-      top: 20px;
-      left: 20px;
-      z-index: 50;
-      font-size: 18px;
+      top: 16px;
+      left: 16px;
+      z-index: 20;
+      font-size: 16px;
       background: rgba(0,0,0,0.7);
-      padding: 12px 16px;
+      padding: 10px 14px;
       border-radius: 10px;
       border: 1px solid #00ff41;
       text-shadow: 0 0 10px #00ff41;
     }
-    #ui div { margin-bottom: 4px; }
+    #ui div { margin-bottom: 2px; }
+
+    /* Intro overlay */
+    #introScreen {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, #001100 0%, #000000 70%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+    .intro-inner {
+      max-width: 720px;
+      width: 100%;
+      margin: 0 16px;
+      background: rgba(0,0,0,0.9);
+      border-radius: 18px;
+      border: 2px solid #00ff41;
+      box-shadow: 0 0 40px #00ff41;
+      padding: 28px 22px 30px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .intro-inner::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: 18px;
+      background: conic-gradient(
+        from 0deg,
+        rgba(0,255,65,0.1),
+        rgba(0,255,65,0.5),
+        rgba(0,255,65,0.1)
+      );
+      opacity: 0.3;
+      filter: blur(8px);
+      z-index: -1;
+      animation: spin 10s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .glitch-title {
+      font-size: 32px;
+      margin-bottom: 8px;
+      text-shadow:
+        0 0 6px #00ff41,
+        0 0 18px #00ff41,
+        2px 0 0 rgba(255,0,0,0.6),
+        -2px 0 0 rgba(0,0,255,0.6);
+    }
+    .intro-sub {
+      font-size: 16px;
+      opacity: 0.9;
+      margin-bottom: 14px;
+    }
+    .intro-meta {
+      font-size: 13px;
+      opacity: 0.7;
+      margin-bottom: 20px;
+    }
+    .intro-list {
+      font-size: 14px;
+      text-align: left;
+      max-width: 540px;
+      margin: 0 auto 20px;
+      opacity: 0.9;
+    }
+    .intro-list li {
+      margin-bottom: 6px;
+    }
+    .intro-btn {
+      display: inline-block;
+      padding: 14px 30px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 16px;
+      border: 2px solid #00ff41;
+      color: #000;
+      background: linear-gradient(45deg,#00ff41,#00cc33);
+      box-shadow: 0 0 22px #00ff41;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .intro-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px #00ff41;
+    }
+    .intro-small {
+      font-size: 12px;
+      opacity: 0.7;
+      margin-top: 8px;
+    }
 
     /* Modals */
     .modal {
@@ -46,7 +140,7 @@
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 100;
+      z-index: 60;
       backdrop-filter: blur(20px);
     }
     .modal-inner {
@@ -57,33 +151,28 @@
       border-radius: 16px;
       border: 2px solid #00ff41;
       box-shadow: 0 0 40px #00ff41;
-      padding: 30px 24px;
+      padding: 28px 22px;
       text-align: center;
     }
     .modal h2 {
-      font-size: 32px;
-      margin-bottom: 10px;
-      text-shadow: 0 0 20px #00ff41;
+      font-size: 28px;
+      margin-bottom: 8px;
+      text-shadow: 0 0 18px #00ff41;
     }
     .modal p {
-      font-size: 16px;
+      font-size: 15px;
       line-height: 1.5;
       margin: 8px 0;
     }
-    .tag-line {
-      font-size: 14px;
-      opacity: 0.8;
-      margin-bottom: 8px;
-    }
     .score-line {
       font-size: 18px;
-      margin: 12px 0;
+      margin: 10px 0;
     }
     .btn-row {
       display: flex;
       flex-direction: column;
       gap: 12px;
-      margin-top: 20px;
+      margin-top: 18px;
     }
     @media (min-width: 640px) {
       .btn-row { flex-direction: row; justify-content: center; flex-wrap: wrap; }
@@ -91,11 +180,11 @@
 
     a.btn, button.btn {
       display: inline-block;
-      padding: 14px 26px;
+      padding: 12px 24px;
       border-radius: 10px;
       text-decoration: none;
       font-weight: bold;
-      font-size: 15px;
+      font-size: 14px;
       border: 2px solid #00ff41;
       color: #000;
       background: linear-gradient(45deg,#00ff41,#00cc33);
@@ -108,35 +197,35 @@
       transform: translateY(-2px);
       box-shadow: 0 0 24px #00ff41;
     }
-    a.btn-secondary {
+    .btn-secondary {
       background: transparent;
       color: #00ff41;
       border-color: #00ff41;
       box-shadow: none;
     }
-    a.btn-secondary:hover {
+    .btn-secondary:hover {
       background: rgba(0,255,65,0.08);
       box-shadow: 0 0 18px #00ff41;
     }
-    a.btn-founders {
+    .btn-founders {
       background: linear-gradient(45deg,#ff00ff,#ff8800);
       border-color: #ff00ff;
       box-shadow: 0 0 22px #ff00ff;
       color: #000;
     }
-
     .small {
       font-size: 12px;
       opacity: 0.75;
-      margin-top: 6px;
+      margin-top: 4px;
+      display: block;
     }
 
-    /* Mobile controls shell – you can wire this in game.js */
+    /* Mobile controls shell (hooked in game.js if you want) */
     #mobileControls {
       position: fixed;
       bottom: 24px;
       left: 24px;
-      z-index: 60;
+      z-index: 30;
       display: none;
     }
     @media (max-width: 768px) {
@@ -173,60 +262,7 @@
       color: #fff;
       font-size: 26px;
       box-shadow: 0 0 22px #ff0000;
-      z-index: 60;
-    }
-
-    /* Upgrade section (always visible under canvas) */
-    #matrix-upgrades {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      padding: 20px 16px 24px;
-      background: linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.0));
-      z-index: 40;
-      text-align: center;
-    }
-    #matrix-upgrades h2 {
-      font-size: 22px;
-      margin-bottom: 8px;
-      text-shadow: 0 0 16px #00ff41;
-    }
-    #matrix-upgrades p {
-      font-size: 14px;
-      opacity: 0.85;
-      margin-bottom: 16px;
-      max-width: 640px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    #matrix-upgrades .upgrade-row {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      justify-content: center;
-    }
-    @media (min-width: 700px) {
-      #matrix-upgrades .upgrade-row {
-        flex-direction: row;
-      }
-    }
-    .upgrade-card {
-      flex: 1;
-      min-width: 260px;
-      background: rgba(0,0,0,0.85);
-      border-radius: 12px;
-      border: 1px solid rgba(0,255,65,0.5);
-      padding: 14px 12px 18px;
-      box-shadow: 0 0 16px rgba(0,255,65,0.3);
-    }
-    .upgrade-card h3 {
-      font-size: 18px;
-      margin-bottom: 6px;
-    }
-    .upgrade-card p {
-      font-size: 13px;
-      margin-bottom: 12px;
+      z-index: 30;
     }
   </style>
 </head>
@@ -236,37 +272,59 @@
 
   <!-- HUD -->
   <div id="ui">
+    <div>SIMULATION: LVL 1</div>
     <div>⏱️ <span id="score">0</span>s</div>
     <div>❤️ <span id="lives">3</span></div>
     <div>🧠 <span id="aiStatus">Awake</span></div>
   </div>
 
+  <!-- Cinematic intro screen -->
+  <div id="introScreen">
+    <div class="intro-inner">
+      <div class="intro-meta">protocol: MATRIXXSCAPE // status: CONNECTED</div>
+      <div class="glitch-title">ESCAPE OR DIE TRYING</div>
+      <p class="intro-sub">
+        Dodge agents. Collect sigils. Survive long enough to punch a hole through the code.
+      </p>
+      <ul class="intro-list">
+        <li>• Free run: one life, pure chaos.</li>
+        <li>• Escape Pass: unlimited lives + AI hints tuned to your movement.</li>
+        <li>• Founders: NFT‑ready sigil + access to ElevatedLives coaching layers.</li>
+      </ul>
+      <button class="intro-btn" onclick="document.getElementById('introScreen').style.display='none'">
+        ▶ ENTER SIMULATION
+      </button>
+      <div class="intro-small">
+        WASD / Arrow keys · Mobile joystick ready · Sound optional but highly recommended.
+      </div>
+    </div>
+  </div>
+
   <!-- Game Over Modal -->
   <div id="gameOver" class="modal">
     <div class="modal-inner">
-      <div class="tag-line">Status: Simulation failed</div>
+      <div class="intro-meta">protocol: FAILURE // status: MATRIX RETAINED</div>
       <h2>MATRIX TRAP</h2>
       <p class="score-line">You survived <span id="finalScore">0</span> seconds.</p>
       <p id="aiFeedback">Your escape pattern shows 73% Matrix attachment. Want help?</p>
 
       <div class="btn-row">
-        <!-- $11 Escape Pass -->
+        <!-- $11 Escape Pass (Stripe Payment Link) -->
         <a class="btn"
            href="https://buy.stripe.com/test_28EbJ21njcuY3yA3P04ow01"
            target="_blank" rel="noopener">
-          $11 ESCAPE PASS<br>
+          $11 ESCAPE PASS
           <span class="small">Unlimited lives + AI hints</span>
         </a>
 
-        <!-- $111 Founders Pass -->
+        <!-- $111 Founders Pass (Stripe Payment Link) -->
         <a class="btn btn-founders"
            href="https://buy.stripe.com/test_5kQ6oId61cuY4CEgBM4ow00"
            target="_blank" rel="noopener">
-          $111 FOUNDERS PASS<br>
+          $111 FOUNDERS
           <span class="small">NFT sigil + monthly AI access</span>
         </a>
 
-        <!-- Free retry -->
         <button id="retry" class="btn btn-secondary">
           🔄 TRY AGAIN FREE
         </button>
@@ -277,16 +335,16 @@
   <!-- Victory Modal -->
   <div id="winScreen" class="modal">
     <div class="modal-inner">
-      <div class="tag-line">Status: Simulation breached</div>
+      <div class="intro-meta">protocol: BREACH // status: MATRIX COMPROMISED</div>
       <h2>MATRIX ESCAPED</h2>
       <p class="score-line">Escape time: <span id="winTime">0</span>s</p>
-      <p id="winFeedback">You are 92% awakened. Reality is bending.</p>
+      <p id="winFeedback">You are 92% awakened. Reality is starting to flicker.</p>
 
       <div class="btn-row">
         <button class="btn" onclick="shareScore()">
           📱 SHARE YOUR ESCAPE
         </button>
-        <a class="btn btn-secondary"
+        <a class="btn btn-founders"
            href="https://buy.stripe.com/test_5kQ6oId61cuY4CEgBM4ow00"
            target="_blank" rel="noopener">
           🜁 UPGRADE TO FOUNDERS
@@ -298,7 +356,7 @@
     </div>
   </div>
 
-  <!-- Mobile controls shell (logic handled in game.js if you use it) -->
+  <!-- Mobile controls shell (wire up in game.js if you want) -->
   <div id="mobileControls">
     <div class="joystick">
       <div class="joystick-knob"></div>
@@ -306,46 +364,23 @@
   </div>
   <button id="shootBtn">🔫</button>
 
-  <!-- Always-visible upgrade strip at bottom -->
-  <section id="matrix-upgrades">
-    <h2>UPGRADE YOUR ESCAPE</h2>
-    <p>
-      Free run gives you a taste. Escape Pass and Founders unlock the full MatrixXscape:
-      more retries, smarter AI coaching, and long‑term ElevatedLives access.
-    </p>
-
-    <div class="upgrade-row">
-      <!-- $11 Escape Pass card -->
-      <div class="upgrade-card">
-        <h3>$11 Escape Pass</h3>
-        <p>
-          Unlimited lives in MatrixXscape + live AI escape hints tuned to how you move.
-          Turn every “death” into data that makes you better.
-        </p>
-        <a class="btn"
-           href="https://buy.stripe.com/test_28EbJ21njcuY3yA3P04ow01"
-           target="_blank" rel="noopener">
-          UNLOCK ESCAPE PASS – $11
-        </a>
-      </div>
-
-      <!-- $111 Founders Pass card -->
-      <div class="upgrade-card">
-        <h3>$111 Founders Pass</h3>
-        <p>
-          Lifetime Founders access: full game, premium AI coaching sessions, plus a
-          unique digital sigil (NFT‑ready) as proof you escaped first.
-        </p>
-        <a class="btn btn-founders"
-           href="https://buy.stripe.com/test_5kQ6oId61cuY4CEgBM4ow00"
-           target="_blank" rel="noopener">
-          JOIN FOUNDERS – $111
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Your game logic (MatrixXscapeGame) lives in this file -->
+  <!-- Your game logic file -->
   <script src="game.js"></script>
+
+  <!-- Simple shareScore fallback so the button doesn't break if not in game.js -->
+  <script>
+    if (typeof shareScore !== 'function') {
+      window.shareScore = function () {
+        const text = "I just tried to escape the Matrix in MatrixXscape – can you beat my run?";
+        const url = window.location.href;
+        const shareText = text + " " + url;
+        if (navigator.share) {
+          navigator.share({ title: "MatrixXscape", text: shareText, url });
+        } else {
+          window.open("https://twitter.com/intent/tweet?text=" + encodeURIComponent(shareText));
+        }
+      }
+    }
+  </script>
 </body>
 </html>
